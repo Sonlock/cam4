@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Escaneo de Códigos de Barras</title>
+    <style>
+        /* Estilos para el contenedor de la máscara de escaneo */
+        .maskContainer-1-2-58 {
+            position: relative;
+            width: 300px; /* Ajustar el tamaño de acuerdo a tus necesidades */
+            height: 300px; /* Ajustar el tamaño de acuerdo a tus necesidades */
+            overflow: hidden;
+        }
+
+        /* Estilos para el video de la previsualización de la cámara */
+        #videoPreview {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    </style>
+</head>
+<body>
+    <div class="maskContainer-1-2-58">
+        <video id="videoPreview"></video>
+        <div class="topLoc-1-2-62 divsOpacity-1-2-59 horizontalDiv-1-2-60"></div>
+        <div class="rightLoc-1-2-65 divsOpacity-1-2-59 verticalDiv-1-2-61"></div>
+        <div class="botLoc-1-2-64 divsOpacity-1-2-59 horizontalDiv-1-2-60"></div>
+        <div class="leftLoc-1-2-63 divsOpacity-1-2-59 verticalDiv-1-2-61"></div>
+    </div>
+
+    <script>
+        // Obtener el elemento de video y la máscara de escaneo
+        const videoPreview = document.getElementById('videoPreview');
+        const maskContainer = document.querySelector('.maskContainer-1-2-58');
+
+        // Obtener la cámara trasera
+        const getBackCamera = async () => {
+            const devices = await navigator.mediaDevices.enumerateDevices();
+            const backCamera = devices.find(device => device.kind === 'videoinput' && device.facingMode === 'environment');
+            return backCamera;
+        }
+
+        // Activar la cámara trasera y mostrar la previsualización en el video
+        const activateCamera = async () => {
+            const backCamera = await getBackCamera();
+            if (backCamera) {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: { deviceId: backCamera.deviceId } });
+                videoPreview.srcObject = stream;
+            } else {
+                console.error('No se encontró la cámara trasera.');
+            }
+        }
+
+        // Iniciar la previsualización de la cámara cuando se cargue la página
+        window.addEventListener('load', () => {
+            activateCamera();
+        });
+
+        // Actualizar el tamaño del video de la previsualización cuando se redimensiona la ventana
+        window.addEventListener('resize', () => {
+            const { width, height } = maskContainer.getBoundingClientRect();
+            videoPreview.style.width = `${width}px`;
+            videoPreview.style.height = `${height}px`;
+        });
+    </script>
+</body>
+</html>
